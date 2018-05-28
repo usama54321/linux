@@ -307,3 +307,10 @@ struct lkl_host_operations lkl_host_ops = {
   .jmp_buf_longjmp = jmp_buf_longjmp;
 };
 
+struct DceExport *g_export;
+struct DceImport *g_import;
+
+void dce_init (struct DceExport *export, struct DceImport *import, struct DceKernel *kernel)
+{
+  
+}
