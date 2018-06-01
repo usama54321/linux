@@ -21,6 +21,8 @@ extern char lkl_virtio_devs[4096];
 
 #ifdef LKL_HOST_CONFIG_POSIX
 #include <sys/uio.h>
+#elif LKL_HOST_CONFIG_DCE
+#include <sys/uio.h>
 #else
 struct iovec {
 	void *iov_base;
