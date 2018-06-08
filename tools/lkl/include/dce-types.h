@@ -11,5 +11,7 @@ extern "C" {
 }
 #endif
 
+struct DceKernel;
+struct DceSocket;
 #endif /* DCE_TYPES_SEEN*/
 

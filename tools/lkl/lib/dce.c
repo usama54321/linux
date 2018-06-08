@@ -3,10 +3,10 @@
 extern struct DceImport g_import;
 extern struct DceExport g_export;
 
-extern lkl_init (struct DceExport *export, struct DceImport *import, struct DceKernel *kernel);
+extern lkl_init (struct DceExport *exported, struct DceImport *imported, struct DceKernel *kernel);
 
-void dce_init (struct DceExport *export, struct DceImport *import, struct DceKernel *kernel)
+void dce_init (struct DceExport *exported, struct DceImport *imported, struct DceKernel *kernel)
 {
-  lkl_init (export, import, kernel);
+  lkl_init (exported, imported, kernel);
   //TODO: atexit for import functions
 }
