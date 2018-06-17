@@ -12,13 +12,13 @@ extern "C" {
 #endif
 
 
-//Inspired from net-next-nuse: sim-init.h
+/* Inspired from net-next-nuse: sim-init.h */
 struct DceExport {
   /*
-   * Function pointer to \
-   * the functions declared \
+   * Function pointer to
+   * the functions declared
    * in lkl.h.
-   * Will remove unused function \
+   * Will remove unused function
    * from this list.
    */
   int (*dce_lkl_add_gateway)(int af,void * gwaddr);
@@ -105,13 +105,15 @@ struct DceExport {
       int optname,
       void *optval, int *optlen);
 
-  // socket poll 
+  /* socket poll */
   void (*sock_poll)(struct DceSocket *socket, void *ret);
   void (*sock_pollfreewait)(void *polltable);
 
-  // Device related calls.
-  // TODO: Checl which are already \
-  // present in lkl.h
+  /*
+   * Device related calls.
+   * TODO: Checl which are already
+   * present in lkl.h
+   */
   struct SimDevice *(*dev_create)(const char *ifname, void *priv,
           enum SimDevFlags flags);
   void (*dev_destroy)(struct SimDevice *dev);
@@ -196,7 +198,7 @@ struct DceImport {
       struct itimerspec *old_value)
 };
 
-// DCE will locate dce_init function after loading lkl library file.
+/* DCE will locate dce_init function after loading lkl library file. */
 typedef void (*DceInit)(struct DceExport *, const struct DceImport *,
       struct DceKernel *kernel);
 void dce_init(struct DceExport *exported, const struct DceImport *imported,

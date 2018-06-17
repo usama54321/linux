@@ -1,11 +1,15 @@
-// Basic headers for any host
-// Contains host operation and system \
-// call interface
+/*
+ * Basic headers for any host
+ * Contains host operation and system
+ * call interface
+ */
 #include <lkl_host.h>
 #include <lkl.h>
 #include <dce-init.h>
-// Some header will get replace with \
-// Dce version
+/*
+ * Some header will get replace with
+ * Dce version
+ */
 #include <pthread.h>
 #include <stdlib.h> 
 #include <sys/time.h>
@@ -25,14 +29,16 @@
 #include "iomem.h"
 #include "jmp_buf.h"
 
-// Referred from posix-host.c
+/* Referred from posix-host.c */
 #include <semaphore.h>
 
 struct DceImport g_import;
-struct SimKernel *g_kernel;
+struct DceKernel *g_kernel;
 
-//TODO: map error number to corresponding \
-//      error message if possible.
+/*
+ * TODO: map error number to corresponding
+ *       error message if possible.
+ */
 static int warn_pthread(int ret, char *str_exp)
 {
   if (ret > 0)
@@ -45,8 +51,10 @@ static int warn_pthread(int ret, char *str_exp)
 static void print (const char *str, int len) 
 {
   ssize_t ret __attribute__((unused));
-	// TODO:Need FD as first parameter
-	//ret = g_import.fwrite (g_kernel, 0, str, len);
+	/*
+   * TODO:Need FD as first parameter
+	 * ret = g_import.fwrite (g_kernel, 0, str, len);
+   */
 }
 
 struct lkl_mutex {
@@ -70,12 +78,16 @@ struct lkl_tls_key {
 
 static void panic (void)
 {
-	// Let DCE handle this.
-	// Add dce_panic, find correct header in DCE
-  return;	
+ /*
+  * Let DCE handle this.
+  * Add dce_panic, find correct header in DCE
+  */
 }
 
-// TODO: Need to decide how to SEMAPHORES should be handle in DCE
+/* 
+ * TODO: Need to decide how to
+ * SEMAPHORES should be handle in DCE
+ */
 static struct lkl_sem* sem_alloc (int count)
 {
   return NULL;
@@ -96,7 +108,10 @@ static void sem_down (struct lkl_sem *sem)
   return;
 }
 
-// TODO: Need to decide how to SEMAPHORES should be handle in DCE
+/* 
+ * TODO: Need to decide how
+ * to SEMAPHORES should be handle in DCE
+ */
 static struct lkl_mutex *mutex_alloc (int recursive)
 {
   return NULL;
@@ -119,15 +134,16 @@ static void mutex_unlock (struct lkl_mutex *mutex)
 
 static lkl_thread_t thread_create (void (*fn)(void *), void *arg)
 {
-	// TODO: is warn message set by DCE.
+  /* TODO: is warn message set by DCE. */
   pthread_t thread;
-  //TODO: might need to redefine; because it seems DCE pthread_create \
-  //      returns zero only no error number.
+  /*
+   * TODO: might need to redefine; because it seems DCE pthread_create
+   *       returns zero only no error number.
+   */
   if (WARN_DCE_PTHREAD(g_import.pthread_create (g_kernel, &thread, NULL, (void* (*)(void *))fn, arg)))
     return 0;
   else
-    return (lkl_thread_t) thread;
-    
+    return (lkl_thread_t) thread;  
 }
 
 static void thread_detach (void)
@@ -135,7 +151,7 @@ static void thread_detach (void)
 	WARN_DCE_PTHREAD(g_import.pthread_detach (g_kernel, g_import.pthread_self (g_kernel)));
 }
 
-//TODO: verify any argument is need rather NULL.
+/* TODO: verify any argument is need rather NULL. */
 static void thread_exit (void)
 {
   g_import.pthread_exit (g_kernel, NULL);
@@ -154,10 +170,12 @@ static lkl_thread_t thread_self (void)
   return (lkl_thread_t) g_import.pthread_self (g_kernel);
 }
 
-// Note: DCE uses NATIVE version of this function.
-//       For now let this function handle by original \
-//       pthread library.
-// TODO: Check, any room to add this function in DCE (dce-pthread.cc).
+/*
+ * Note: DCE uses NATIVE version of this function.
+ *       For now let this function handle by original
+ *       pthread library.
+ * TODO: Check, any room to add this function in DCE (dce-pthread.cc).
+ */
 static int thread_equal (lkl_thread_t a, lkl_thread_t b)
 {
   return pthread_equal((pthread_t)a, (pthread_t)b);
@@ -165,7 +183,7 @@ static int thread_equal (lkl_thread_t a, lkl_thread_t b)
 
 static struct lkl_tls_key *tls_alloc (void (*destructor)(void *))
 {
-  // TODO: Why POSIX won't typecast to (lkl_tls_key *)
+  /* TODO: Why POSIX won't typecast to (lkl_tls_key *) */
 	struct lkl_tls_key *ret = g_import.malloc (g_kernel, sizeof (struct lkl_tls_key));
   if (WARN_DCE_PTHREAD(g_import.pthread_key_create (g_kernel, &ret->key, destructor)))
   {
@@ -198,9 +216,11 @@ static void* mem_alloc (unsigned long size)
   return g_import.malloc (g_kernel, (size_t) size);
 }
 
-// Standard and DCE free method doesn't \
-// return any thing.
-// TODO: What should be the return value here?
+/*
+ * Standard and DCE free method doesn't
+ * return any thing.
+ * TODO: What should be the return value here?
+ */
 static void mem_free (void * ptr)
 {
   g_import.free (g_kernel, ptr);
@@ -209,7 +229,7 @@ static void mem_free (void * ptr)
 static unsigned long long time_ns (void)
 {
   struct timespec ts;
-  // TODO: check which clk id best suits in DCE
+  /* TODO: check which clk id best suits in DCE */
   g_import.clock_gettime (g_kernel, CLOCK_MONOTONIC, &ts);
   return 1e9*ts.tv_sec + ts.tv_nsec;
 }
@@ -228,7 +248,7 @@ static void *timer_alloc (void (*fn)(void *), void *arg)
   err = g_import.timer_create (g_kernel, CLOCK_REALTIME, &se, &timer);
   if (err)
     return NULL;
-  // TODO: why directly typecast into (void *)
+  /* TODO: why directly typecast into (void *) */
   return (void *)(long) timer;
 }
 
@@ -244,28 +264,38 @@ static int timer_set_oneshot (void *_timer, unsigned long ns)
   return g_import.timer_settime(g_kernel, timer, 0, &ts, NULL);
 }
 
-// dce_timer_delete not found
-// TODO: try to find workaround
+/*
+ * dce_timer_delete not found
+ * TODO: try to find workaround
+ */
 static void timer_free (void *timer)
 {
   return;
 }
 
-// @ioremap - searches for an I/O memory region identified by addr and size and
-// returns a pointer to the start of the address range that can be used by
-// iomem_access
+/*
+ * @ioremap - searches for an I/O memory region identified by addr and size and
+ * returns a pointer to the start of the address range that can be used by
+ * iomem_access
+ */
 static void* ioremap (long addr, int size)
 {
-  // As such not need;
-  // TODO:discuss and descibe some action
+ /*
+  * As such not need;
+  * TODO:discuss and descibe some action
+  */
 }
 
-// @iomem_acess - reads or writes to and I/O memory region; addr must be in the
-// * range returned by ioremap
+/*
+ * @iomem_acess - reads or writes to and I/O memory region; addr must be in the
+ * range returned by ioremap
+ */
 static int iomem_access (const volatile void *addr, void *val, int size, int write)
 {
-  // As such not need;
-  // TODO:discuss and descibe some action
+ /*
+  * As such not need;
+  * TODO:discuss and descibe some action
+  */
 }
 
 static long _gettid (void)
@@ -274,31 +304,32 @@ static long _gettid (void)
 }
 
 /*
-// @jmp_buf_set - runs the give function and setups a jump back point by saving
-// the context in the jump buffer; jmp_buf_longjmp can be called from the give
-// function or any callee in that function to return back to the jump back
-// point
+ * @jmp_buf_set - runs the give function and setups a jump back point by saving
+ * the context in the jump buffer; jmp_buf_longjmp can be called from the give
+ * function or any callee in that function to return back to the jump back
+ * point
+ */
 static void jmp_buf_set (struct lkl_jmp_buf *jmpb, void (*f)(void))
 {
-  // Seems relevant to dce, not sure how to handle;
+  /* Seems relevant to dce, not sure how to handle; */
   return;
 }
 
 static void jmp_buf_longjmp (struct lkl_jmp_buf *jmpb, int val)
 {
-  // Seems relevant to dce, not sure how to handle;
+  /* Seems relevant to dce, not sure how to handle; */
   return;
-}*/
+}
 
 
 struct lkl_host_operations lkl_host_ops = {
   .print = print,
   .panic = panic,
-  //.lkl_sem = lkl_sem,
+  /* .lkl_sem = lkl_sem, */
   .sem_free = sem_free,
   .sem_up = sem_up,
   .sem_down = sem_down,
-  //.lkl_mutex = lkl_mutex,
+  /* .lkl_mutex = lkl_mutex, */
   .mutex_free = mutex_free,
   .mutex_lock = mutex_lock,
   .mutex_unlock = mutex_unlock,
@@ -311,7 +342,7 @@ struct lkl_host_operations lkl_host_ops = {
   .tls_alloc = tls_alloc,
   .tls_free = tls_free,
   .tls_set = tls_set,
-  //.tls_get = tls_get,
+  /* .tls_get = tls_get, */
   .mem_alloc = mem_alloc,
   .mem_free = mem_free,
   .time = time_ns,
@@ -329,8 +360,10 @@ void lkl_init (struct DceExport *export, struct DceImport *import, struct DceKer
 {
   g_import = *import;
   g_kernel = kernel;
-  //TODO: fill the struct DceExport *export
-       // Start the kernel
+  /*
+   * TODO: fill the struct DceExport *export
+   * Start the kernel
+   */
   return; 
 }
 

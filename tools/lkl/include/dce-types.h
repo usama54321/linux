@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-// Add structure list
+/* Add structure list */
 
 #ifdef __cplusplus
 }

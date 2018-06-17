@@ -8,5 +8,5 @@ extern lkl_init (struct DceExport *exported, struct DceImport *imported, struct 
 void dce_init (struct DceExport *exported, struct DceImport *imported, struct DceKernel *kernel)
 {
   lkl_init (exported, imported, kernel);
-  //TODO: atexit for import functions
+  /* TODO: atexit for import functions */
 }
