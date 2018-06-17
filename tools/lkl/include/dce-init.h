@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <linux/types.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
