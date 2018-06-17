@@ -195,7 +195,7 @@ struct DceImport {
       struct sigevent *sevp, timer_t *timerid);
   int (*timer_settime) (struct DceKernel *kernel, int fd, int flags,
       const struct itimerspec *new_value,
-      struct itimerspec *old_value)
+      struct itimerspec *old_value);
 };
 
 /* DCE will locate dce_init function after loading lkl library file. */

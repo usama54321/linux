@@ -95,17 +95,14 @@ static struct lkl_sem* sem_alloc (int count)
 
 static void sem_free (struct lkl_sem *sem)
 {
-  return;
 }
 
 static void sem_up (struct lkl_sem *sem)
 {
-  return;
 }
 
 static void sem_down (struct lkl_sem *sem)
 {
-  return;
 }
 
 /* 
@@ -119,17 +116,14 @@ static struct lkl_mutex *mutex_alloc (int recursive)
 
 static void mutex_free (struct lkl_mutex *mutex)
 {
-	return;
 }
 
 static void mutex_lock (struct lkl_mutex *mutex)
 {
-  return;
 }
 
 static void mutex_unlock (struct lkl_mutex *mutex)
 {
-  return;
 }
 
 static lkl_thread_t thread_create (void (*fn)(void *), void *arg)
@@ -201,14 +195,14 @@ static void tls_free (struct lkl_tls_key *key)
 
 static int tls_set (struct lkl_tls_key *key, void *data)
 {
-  if (WARN_DCE_PTHREAD(g_import.pthread_setspecific (g_kernel, key->key, data)));
+  if (WARN_DCE_PTHREAD(g_import.pthread_setspecific (g_kernel, key->key, data)))
     return -1;
   return 0;
 }
 
 static void tls_get(struct lkl_tls_key *key)
 {
-  return g_import.pthread_getspecific (g_kernel, key->key);  
+  g_import.pthread_getspecific (g_kernel, key->key);  
 }
 
 static void* mem_alloc (unsigned long size)
@@ -284,6 +278,7 @@ static void* ioremap (long addr, int size)
   * As such not need;
   * TODO:discuss and descibe some action
   */
+  return NULL;
 }
 
 /*
@@ -296,6 +291,7 @@ static int iomem_access (const volatile void *addr, void *val, int size, int wri
   * As such not need;
   * TODO:discuss and descibe some action
   */
+  return 0;
 }
 
 static long _gettid (void)
@@ -309,13 +305,13 @@ static long _gettid (void)
  * function or any callee in that function to return back to the jump back
  * point
  */
-static void jmp_buf_set (struct lkl_jmp_buf *jmpb, void (*f)(void))
+static void _jmp_buf_set (struct lkl_jmp_buf *jmpb, void (*f)(void))
 {
   /* Seems relevant to dce, not sure how to handle; */
   return;
 }
 
-static void jmp_buf_longjmp (struct lkl_jmp_buf *jmpb, int val)
+static void _jmp_buf_longjmp (struct lkl_jmp_buf *jmpb, int val)
 {
   /* Seems relevant to dce, not sure how to handle; */
   return;
@@ -352,8 +348,8 @@ struct lkl_host_operations lkl_host_ops = {
   .ioremap = ioremap,
   .iomem_access = iomem_access,
   .gettid = _gettid,
-  .jmp_buf_set = jmp_buf_set,
-  .jmp_buf_longjmp = jmp_buf_longjmp,
+  .jmp_buf_set = _jmp_buf_set,
+  .jmp_buf_longjmp = _jmp_buf_longjmp,
 };
 
 void lkl_init (struct DceExport *export, struct DceImport *import, struct DceKernel *kernel)
