@@ -14,13 +14,6 @@ extern "C" {
 
 /* Inspired from net-next-nuse: sim-init.h */
 struct DceExport {
-  /*
-   * Function pointer to
-   * the functions declared
-   * in lkl.h.
-   * Will remove unused function
-   * from this list.
-   */
   int (*dce_lkl_add_gateway)(int af,void * gwaddr);
   int (*dce_lkl_add_neighbor)(int ifindex,int af,void * addr,void * mac);
   int (*dce_lkl_closedir)(struct lkl_dir * dir);
@@ -111,7 +104,7 @@ struct DceExport {
 
   /*
    * Device related calls.
-   * TODO: Checl which are already
+   * TODO: Check which are already
    * present in lkl.h
    */
   struct SimDevice *(*dev_create)(const char *ifname, void *priv,

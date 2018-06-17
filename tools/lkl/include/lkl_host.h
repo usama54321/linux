@@ -19,7 +19,7 @@ int lkl_printf(const char *fmt, ...);
 
 extern char lkl_virtio_devs[4096];
 
-#if LKL_HOST_CONFIG_DCE
+#ifdef LKL_HOST_CONFIG_DCE
 #include <sys/uio.h>
 #else
 #if 0
