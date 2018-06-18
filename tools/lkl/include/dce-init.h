@@ -14,7 +14,7 @@ extern "C" {
 
 
 /* Inspired from net-next-nuse: sim-init.h */
-struct DceExport {
+struct KernelHandle {
   int (*dce_lkl_add_gateway)(int af,void * gwaddr);
   int (*dce_lkl_add_neighbor)(int ifindex,int af,void * addr,void * mac);
   int (*dce_lkl_closedir)(struct lkl_dir * dir);
@@ -126,7 +126,7 @@ struct DceExport {
       const char *buffer, int size, int offset);
 };
 
-struct DceImport {
+struct DceHandle {
   int (*vprintf)(struct DceKernel *kernel, const char *str,
       va_list args);
   void *(*malloc)(struct DceKernel *kernel, unsigned long size);
@@ -192,10 +192,10 @@ struct DceImport {
       struct itimerspec *old_value);
 };
 
-/* DCE will locate dce_init function after loading lkl library file. */
-typedef void (*DceInit)(struct DceExport *, const struct DceImport *,
+/* DCE will locate sim_init function after loading lkl library file. */
+typedef void (*SimInit)(struct KernelHandle *, const struct DceHandle *,
       struct DceKernel *kernel);
-void dce_init(struct DceExport *exported, const struct DceImport *imported,
+void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHandle,
       struct DceKernel *kernel);
 #ifdef __cplusplus
 }

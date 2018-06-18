@@ -32,7 +32,7 @@
 /* Referred from posix-host.c */
 #include <semaphore.h>
 
-struct DceImport g_import;
+struct DceHandle g_dceHandle;
 struct DceKernel *g_kernel;
 
 /*
@@ -53,7 +53,7 @@ static void print (const char *str, int len)
   ssize_t ret __attribute__((unused));
 	/*
    * TODO:Need FD as first parameter
-	 * ret = g_import.fwrite (g_kernel, 0, str, len);
+	 * ret = g_dceHandle.fwrite (g_kernel, 0, str, len);
    */
 }
 
@@ -134,7 +134,7 @@ static lkl_thread_t thread_create (void (*fn)(void *), void *arg)
    * TODO: might need to redefine; because it seems DCE pthread_create
    *       returns zero only no error number.
    */
-  if (WARN_DCE_PTHREAD(g_import.pthread_create (g_kernel, &thread, NULL, (void* (*)(void *))fn, arg)))
+  if (WARN_DCE_PTHREAD(g_dceHandle.pthread_create (g_kernel, &thread, NULL, (void* (*)(void *))fn, arg)))
     return 0;
   else
     return (lkl_thread_t) thread;  
@@ -142,18 +142,18 @@ static lkl_thread_t thread_create (void (*fn)(void *), void *arg)
 
 static void thread_detach (void)
 {
-	WARN_DCE_PTHREAD(g_import.pthread_detach (g_kernel, g_import.pthread_self (g_kernel)));
+	WARN_DCE_PTHREAD(g_dceHandle.pthread_detach (g_kernel, g_dceHandle.pthread_self (g_kernel)));
 }
 
 /* TODO: verify any argument is need rather NULL. */
 static void thread_exit (void)
 {
-  g_import.pthread_exit (g_kernel, NULL);
+  g_dceHandle.pthread_exit (g_kernel, NULL);
 }
 
 static int thread_join (lkl_thread_t tid)
 {
-  if (WARN_DCE_PTHREAD(g_import.pthread_join (g_kernel, (pthread_t) tid, NULL)))
+  if (WARN_DCE_PTHREAD(g_dceHandle.pthread_join (g_kernel, (pthread_t) tid, NULL)))
     return -1;
   else
     return 0;
@@ -161,7 +161,7 @@ static int thread_join (lkl_thread_t tid)
 
 static lkl_thread_t thread_self (void)
 {
-  return (lkl_thread_t) g_import.pthread_self (g_kernel);
+  return (lkl_thread_t) g_dceHandle.pthread_self (g_kernel);
 }
 
 /*
@@ -178,10 +178,10 @@ static int thread_equal (lkl_thread_t a, lkl_thread_t b)
 static struct lkl_tls_key *tls_alloc (void (*destructor)(void *))
 {
   /* TODO: Why POSIX won't typecast to (lkl_tls_key *) */
-	struct lkl_tls_key *ret = g_import.malloc (g_kernel, sizeof (struct lkl_tls_key));
-  if (WARN_DCE_PTHREAD(g_import.pthread_key_create (g_kernel, &ret->key, destructor)))
+	struct lkl_tls_key *ret = g_dceHandle.malloc (g_kernel, sizeof (struct lkl_tls_key));
+  if (WARN_DCE_PTHREAD(g_dceHandle.pthread_key_create (g_kernel, &ret->key, destructor)))
   {
-    g_import.free (g_kernel, ret);
+    g_dceHandle.free (g_kernel, ret);
     return NULL;
   }
   return ret;
@@ -189,25 +189,25 @@ static struct lkl_tls_key *tls_alloc (void (*destructor)(void *))
 
 static void tls_free (struct lkl_tls_key *key)
 {
-  WARN_DCE_PTHREAD(g_import.pthread_key_delete (g_kernel, key->key));
-  g_import.free (g_kernel, key);
+  WARN_DCE_PTHREAD(g_dceHandle.pthread_key_delete (g_kernel, key->key));
+  g_dceHandle.free (g_kernel, key);
 }
 
 static int tls_set (struct lkl_tls_key *key, void *data)
 {
-  if (WARN_DCE_PTHREAD(g_import.pthread_setspecific (g_kernel, key->key, data)))
+  if (WARN_DCE_PTHREAD(g_dceHandle.pthread_setspecific (g_kernel, key->key, data)))
     return -1;
   return 0;
 }
 
 static void tls_get(struct lkl_tls_key *key)
 {
-  g_import.pthread_getspecific (g_kernel, key->key);  
+  g_dceHandle.pthread_getspecific (g_kernel, key->key);  
 }
 
 static void* mem_alloc (unsigned long size)
 {
-  return g_import.malloc (g_kernel, (size_t) size);
+  return g_dceHandle.malloc (g_kernel, (size_t) size);
 }
 
 /*
@@ -217,14 +217,14 @@ static void* mem_alloc (unsigned long size)
  */
 static void mem_free (void * ptr)
 {
-  g_import.free (g_kernel, ptr);
+  g_dceHandle.free (g_kernel, ptr);
 }
 
 static unsigned long long time_ns (void)
 {
   struct timespec ts;
   /* TODO: check which clk id best suits in DCE */
-  g_import.clock_gettime (g_kernel, CLOCK_MONOTONIC, &ts);
+  g_dceHandle.clock_gettime (g_kernel, CLOCK_MONOTONIC, &ts);
   return 1e9*ts.tv_sec + ts.tv_nsec;
 }
 
@@ -239,7 +239,7 @@ static void *timer_alloc (void (*fn)(void *), void *arg)
     },
     .sigev_notify_function = (void (*)(union sigval))fn,
   };
-  err = g_import.timer_create (g_kernel, CLOCK_REALTIME, &se, &timer);
+  err = g_dceHandle.timer_create (g_kernel, CLOCK_REALTIME, &se, &timer);
   if (err)
     return NULL;
   /* TODO: why directly typecast into (void *) */
@@ -255,7 +255,7 @@ static int timer_set_oneshot (void *_timer, unsigned long ns)
       .tv_nsec = ns % 1000000000,
     },
   };
-  return g_import.timer_settime(g_kernel, timer, 0, &ts, NULL);
+  return g_dceHandle.timer_settime(g_kernel, timer, 0, &ts, NULL);
 }
 
 /*
@@ -296,7 +296,7 @@ static int iomem_access (const volatile void *addr, void *val, int size, int wri
 
 static long _gettid (void)
 {
-  return (long) g_import.pthread_self (g_kernel);  
+  return (long) g_dceHandle.pthread_self (g_kernel);  
 }
 
 /*
@@ -352,12 +352,12 @@ struct lkl_host_operations lkl_host_ops = {
   .jmp_buf_longjmp = _jmp_buf_longjmp,
 };
 
-void lkl_init (struct DceExport *export, struct DceImport *import, struct DceKernel *kernel)
+void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHandle, struct DceKernel *kernel)
 {
-  g_import = *import;
+  g_dceHandle = *dceHandle;
   g_kernel = kernel;
   /*
-   * TODO: fill the struct DceExport *export
+   * TODO: fill the struct KernelHandle *export
    * Start the kernel
    */
   return; 
