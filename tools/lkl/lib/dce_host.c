@@ -356,6 +356,8 @@ void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHand
 {
   g_dceHandle = *dceHandle;
   g_kernel = kernel;
+  #include "kernel_handle_assignment_generated.c"
+
   /*
    * TODO: fill the struct KernelHandle *export
    * Start the kernel
