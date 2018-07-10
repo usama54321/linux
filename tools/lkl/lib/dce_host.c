@@ -358,7 +358,23 @@ void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHand
   g_kernel = kernel;
   #include "kernel_handle_assignment_generated.c"
 
-  /*
+  kernelHandle->sock_socket = dce_sock_socket;
+  kernelHandle->sock_close = dce_sock_close;
+  kernelHandle->sock_recvmsg = dce_sock_recvmsg;
+  kernelHandle->sock_sendmsg = dce_sock_sendmsg;
+  kernelHandle->sock_getsockname = dce_sock_getsockname;
+  kernelHandle->sock_getpeername = dce_sock_getpeername;
+  kernelHandle->sock_bind = dce_sock_bind;
+  kernelHandle->sock_connect = dce_sock_connect;
+  kernelHandle->sock_listen = dce_sock_listen;
+  kernelHandle->sock_shutdown = dce_sock_shutdown;
+  kernelHandle->sock_shutdown = dce_sock_shutdown;
+  kernelHandle->sock_accept = dce_sock_accept;
+  kernelHandle->sock_ioctl = dce_sock_ioctl;
+  kernelHandle->sock_setsockopt = dce_sock_setsockopt;
+  kernelHandle->sock_getsockopt = dce_sock_getsockopt
+
+/*
    * TODO: fill the struct KernelHandle *export
    * Start the kernel
    */
