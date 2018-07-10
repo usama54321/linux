@@ -14,6 +14,12 @@ enum SimDevFlags {
 };
 
 struct SimSysIterator {
+  void (*report_start_dir)(const struct SimSysIterator *iter,
+        const char *dirname);
+  void (*report_end_dir)(const struct SimSysIterator *iter);
+  void (*report_file)(const struct SimSysIterator *iter,
+      const char *filename,
+      int flags, struct SimSysFile *file);
 };
 
 struct SimSysFile {
