@@ -381,6 +381,31 @@ void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHand
   return; 
 }
 
+int lib_vprintf(const char *str, va_list args)
+{
+  return g_dceHandle->vprintf (g_kernel, str, args);
+}
+
+void *lib_malloc(unsigned long size)
+{
+  return g_dceHandle->malloc (g_kernel, size);
+}
+
+void lib_free(void *buffer)
+{
+  g_dceHandle->malloc (g_kernel, buffer)
+}
+
+void *lib_memcpy(void *dst, const void *src, unsigned long size)
+{
+  return g_dceHandle->memcpy (g_kernel, dst, src, size);
+}
+
+void *lib_memset(void *dst, char value, unsigned long size)
+{
+  return g_dceHandle->memset (g_kernel, dst, value, size);
+}
+
 static int fd_get_capacity(struct lkl_disk disk, unsigned long long *res)
 {
   off_t off;
