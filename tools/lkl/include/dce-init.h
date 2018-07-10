@@ -18,6 +18,9 @@ struct KernelHandle {
 
   #include "lkl_kernel_handle_api_generated.h"
 
+  struct SimTask *(*task_create)(void *priv, unsigned long pid);
+  void *(*task_get_private)(struct SimTask *task);
+
   /*
    * Socket related export function.
    */
