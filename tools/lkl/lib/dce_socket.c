@@ -3,7 +3,7 @@
 #include <net/sock.h>
 #include "dce-init.h"
 #include "../include/dce-types.h"
-
+#include "../include/dce_socket.h"
 
 int dce_sock_socket (int domain, int type, int protocol, struct DceSocket **socket)
 {
@@ -65,7 +65,7 @@ int dce_sock_bind (struct DceSocket *socket, const struct sockaddr *name, int na
 
 }
 
-int dce_sock_connect (struct DceSocket *socket, const struct sockaddr *name, int namelen, int flags);
+int dce_sock_connect (struct DceSocket *socket, const struct sockaddr *name, int namelen, int flags)
 {
   struct socket *kernel_socket = (struct socket *)socket;
   struct sockaddr_storage address;

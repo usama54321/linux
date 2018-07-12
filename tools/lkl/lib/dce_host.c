@@ -6,6 +6,8 @@
 #include <lkl_host.h>
 #include <lkl.h>
 #include <dce-init.h>
+#include <dce_socket.h>
+
 /*
  * Some header will get replace with
  * Dce version
@@ -372,7 +374,7 @@ void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHand
   kernelHandle->sock_accept = dce_sock_accept;
   kernelHandle->sock_ioctl = dce_sock_ioctl;
   kernelHandle->sock_setsockopt = dce_sock_setsockopt;
-  kernelHandle->sock_getsockopt = dce_sock_getsockopt
+  kernelHandle->sock_getsockopt = dce_sock_getsockopt;
 
 /*
    * TODO: fill the struct KernelHandle *export
@@ -383,27 +385,27 @@ void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHand
 
 int lib_vprintf(const char *str, va_list args)
 {
-  return g_dceHandle->vprintf (g_kernel, str, args);
+  return g_dceHandle.vprintf (g_kernel, str, args);
 }
 
 void *lib_malloc(unsigned long size)
 {
-  return g_dceHandle->malloc (g_kernel, size);
+  return g_dceHandle.malloc (g_kernel, size);
 }
 
 void lib_free(void *buffer)
 {
-  g_dceHandle->malloc (g_kernel, buffer)
+  g_dceHandle.free (g_kernel, buffer);
 }
 
 void *lib_memcpy(void *dst, const void *src, unsigned long size)
 {
-  return g_dceHandle->memcpy (g_kernel, dst, src, size);
+  return g_dceHandle.memcpy (g_kernel, dst, src, size);
 }
 
 void *lib_memset(void *dst, char value, unsigned long size)
 {
-  return g_dceHandle->memset (g_kernel, dst, value, size);
+  return g_dceHandle.memset (g_kernel, dst, value, size);
 }
 
 static int fd_get_capacity(struct lkl_disk disk, unsigned long long *res)
