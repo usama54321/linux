@@ -22,6 +22,11 @@ struct SimSysIterator {
       int flags, struct SimSysFile *file);
 };
 
+struct SimDevicePacket {
+ void *buffer;
+ void *token;
+};
+
 struct SimSysFile {
 };
 
