@@ -375,6 +375,8 @@ void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHand
   kernelHandle->sock_ioctl = dce_sock_ioctl;
   kernelHandle->sock_setsockopt = dce_sock_setsockopt;
   kernelHandle->sock_getsockopt = dce_sock_getsockopt;
+  kernelHandle->dce_lkl_sysctl = lkl_sysctl;
+  kernelHandle->dce_lkl_sysctl_get = lkl_sysctl_get;
 
 /*
    * TODO: fill the struct KernelHandle *export

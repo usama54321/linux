@@ -47,6 +47,7 @@ const char * (*dce_lkl_strerror)(int err);
 long long (*dce_lkl_sys_lseek)(unsigned int fd,__lkl__kernel_loff_t off,unsigned int whence);
 void * (*dce_lkl_sys_mmap)(void * addr,size_t length,int prot,int flags,int fd,off_t offset);
 int (*dce_lkl_sysctl)(const char * path,const char * value);
+int (*dce_lkl_sysctl_get)(const char *path, char *buffer, int size);
 void (*dce_lkl_sysctl_parse_write)(const char * sysctls);
 long (*dce_lkl_umount_dev)(unsigned int disk_id,unsigned int part,int flags,long timeout_ms);
 long (*dce_lkl_umount_timeout)(char * path,int flags,long timeout_ms);
