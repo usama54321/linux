@@ -31,12 +31,12 @@ int dce_sock_close (struct DceSocket *socket)
 
 ssize_t dce_sock_recvmsg (struct DceSocket *socket, struct msghdr *msg, int flags)
 {
-
+  return 0;
 }
 
 ssize_t dce_sock_sendmsg (struct DceSocket *socket, const struct msghdr *msg, int flags)
 {
-
+  return 0;
 }
 
 int dce_sock_getsockname (struct DceSocket *socket, struct sockaddr *name, int *namelen)
@@ -62,7 +62,6 @@ int dce_sock_bind (struct DceSocket *socket, const struct sockaddr *name, int na
   memcpy(&address, name, namelen);
   int error = kernel_socket->ops->bind(kernel_socket, (struct sockaddr *)&address, namelen);
   return error;
-
 }
 
 int dce_sock_connect (struct DceSocket *socket, const struct sockaddr *name, int namelen, int flags)
@@ -94,11 +93,12 @@ int dce_sock_shutdown (struct DceSocket *socket, int how)
 
 int dce_sock_accept (struct DceSocket *socket, struct DceSocket **newSocket, int flags)
 {
-
+  return 0;
 }
 
 int dce_sock_ioctl (struct DceSocket *socket, int request, char *argp)
 {
+  return 0;
   // Need to create lkl_device first
 }
 

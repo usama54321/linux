@@ -3,7 +3,7 @@
 
 #include <linux/net.h>
 #include <linux/errno.h>
-//#include <net/sock.h>
+#include <net/sock.h>
 #include "dce-init.h"
 #include "../include/dce-types.h"
 
