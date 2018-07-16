@@ -377,6 +377,13 @@ void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHand
   kernelHandle->sock_getsockopt = dce_sock_getsockopt;
   kernelHandle->dce_lkl_sysctl = lkl_sysctl;
   kernelHandle->dce_lkl_sysctl_get = lkl_sysctl_get;
+  kernelHandle->dev_create = dce_dev_create;
+  kernelHandle->dev_destroy = dce_dev_destroy;
+  kernelHandle->dev_get_private = dce_dev_get_private;
+  kernelHandle->dev_set_address = dce_dev_set_address;
+  kernelHandle->dev_set_mtu = dce_dev_set_mtu;
+  kernelHandle->dev_rx = dce_dev_rx;
+  kernelHandle->dev_create_packet = dce_dev_create_packet;
 
 /*
    * TODO: fill the struct KernelHandle *export
