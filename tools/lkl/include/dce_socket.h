@@ -5,7 +5,7 @@
 #include <linux/errno.h>
 #include <net/sock.h>
 #include "dce-init.h"
-#include "../include/dce-types.h"
+#include "dce-types.h"
 
 #ifdef __cplusplus
 extern "C" {

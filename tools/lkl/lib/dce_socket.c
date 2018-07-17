@@ -2,8 +2,8 @@
 #include <linux/errno.h>
 #include <net/sock.h>
 #include "dce-init.h"
-#include "../include/dce-types.h"
-#include "../include/dce_socket.h"
+#include "dce-types.h"
+#include "dce_socket.h"
 
 int dce_sock_socket (int domain, int type, int protocol, struct DceSocket **socket)
 {
