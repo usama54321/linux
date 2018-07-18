@@ -1,32 +1,86 @@
 #include <lkl.h>
+#include <linux/ethtool.h>
+#include <linux/etherdevice.h>
+#include <linux/netdevice.h>
+#include <linux/if_arp.h>
+#include <linux/ethtool.h>
 
+
+struct lkl_dev_net_ops net_dce_ops =  {
+  .tx = net_dce_tx,
+  .rx = net_dce_rx,
+  .poll = net_dce_poll,
+  .poll_hup = net_dce_poll_hup,
+  .free = net_dce_free,
+};
+
+int net_dce_tx (struct lkl_netdev *nd, struct iovec *iov, int cnt)
+{
+
+}
+
+int net_dce_rx (struct lkl_netdev *nd, struct iovec *iov, int cnt)
+{
+
+}
+
+int net_dce_poll (struct lkl_netdev *nd)
+{
+
+}
+
+int net_dce_poll_hup (struct lkl_netdev *nd)
+{
+
+}
+
+int net_dce_free (struct lkl_netdev *nd)
+{
+
+}
 
 struct SimDevice *dce_dev_create (const char *iface, void *priv, enum SimDevFlags flags)
 {
+  int err;
+  struct SimDevice *dev =
+    (struct SimDevice *)alloc_netdev(sizeof(struct SimDevice),
+             ifname, NET_NAME_UNKNOWN,
+             &lib_dev_setup);
+  ether_setup((struct net_device *)dev);
 
+  if (flags & SIM_DEV_NOARP)
+    dev->dev.flags |= IFF_NOARP;
+  if (flags & SIM_DEV_POINTTOPOINT)
+    dev->dev.flags |= IFF_POINTOPOINT;
+  if (flags & SIM_DEV_MULTICAST)
+    dev->dev.flags |= IFF_MULTICAST;
+  if (flags & SIM_DEV_BROADCAST) {
+    dev->dev.flags |= IFF_BROADCAST; 
+    memset(dev->dev.broadcast, 0xff, 6);
+  }
+  dev->= priv;
+  err = register_netdev(&dev->dev);
+  return dev;
 }
 
 
 void dce_dev_destroy (struct SimDevice *dev)
 {
-
-}
-
-void * dce_dev_get_private (struct SimDevice *task)
-{
-
+  unregister_netdev(&dev->dev);
+  /* XXX */
+  free_netdev(&dev->dev);
 }
 
 void dce_dev_set_address (struct SimDevice *dev, unsigned char buffer[6])
 {
-  int ifindex = lkl_name_to_ifindex (dev);
+  int ifindex = get_device_ifindex (dev); 
   if (dev->dev.type == AF_INET)
   {
     lkl_if_set_ipv4 (ifindex, addr, netmask_len);
   }
   else if (dev->dev.type == AF_INET6)
   {
-    lkl_if_set_ipv4 (ifindex, addr, netprefix_len);
+    lkl_if_set_ipv6 (ifindex, addr, netprefix_len);
   }
   else
   {
@@ -36,8 +90,8 @@ void dce_dev_set_address (struct SimDevice *dev, unsigned char buffer[6])
 
 void dce_dev_set_mtu (struct SimDevice *dev, int mtu)
 {
-  int ifindex = lkl_name_to_ifindex (dev);
-  lkl_if_set_mtu (ifindex);
+  int ifindex = get_device_ifindex (dev);
+  lkl_if_set_mtu (ifindex, mtu);
 }
 
 void dce_dev_rx (struct SimDevice *dev, struct SimDevicePacket packet)
@@ -50,3 +104,7 @@ struct SimDevicePacket dce_dev_create_packet (struct SimDevice *dev, int size)
 
 }
 
+int get_device_ifindex (struct SimDevice *dev)
+{
+  return dev->dev.ifindex;
+}
