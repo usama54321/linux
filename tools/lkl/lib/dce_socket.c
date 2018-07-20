@@ -8,11 +8,14 @@
 int dce_sock_socket (int domain, int type, int protocol, struct DceSocket **socket)
 {
   struct socket **kernel_socket = (struct socket **)socket;
-  // Check type if any unsupport flag is passed
-  if (type)
-  {
+  int flags;
+
+  /* from net/socket.c */
+  flags = type & ~SOCK_TYPE_MASK;
+  if (flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK))
     return -EINVAL;
-  }
+  type &= SOCK_TYPE_MASK
+
 
   int reteval = sock_create(domain, type, protocol, kernel_socket);
   struct file *fp = lib_malloc(sizeof(struct file));
@@ -29,14 +32,14 @@ int dce_sock_close (struct DceSocket *socket)
   return 0;
 }
 
-ssize_t dce_sock_recvmsg (struct DceSocket *socket, struct msghdr *msg, int flags)
+ssize_t dce_sock_recvmsg (struct DceSocket *socket, struct msghdr *msg, int flags, int fd)
 {
-  return 0;
+  return lkl_sys_recvmsg (fd, msg, flag);
 }
 
-ssize_t dce_sock_sendmsg (struct DceSocket *socket, const struct msghdr *msg, int flags)
+ssize_t dce_sock_sendmsg (struct DceSocket *socket, const struct msghdr *msg, int flags, int fd)
 {
-  return 0;
+  return lkl_sys_sendmsg (fd, msg, flag);
 }
 
 int dce_sock_getsockname (struct DceSocket *socket, struct sockaddr *name, int *namelen)
@@ -93,6 +96,25 @@ int dce_sock_shutdown (struct DceSocket *socket, int how)
 
 int dce_sock_accept (struct DceSocket *socket, struct DceSocket **newSocket, int flags)
 {
+  struct socket *sock, *newsock;
+  int err;
+
+  sock = (struct socket *)socket;
+
+  /* the fields do not matter here. If we could, */
+  /* we would call sock_alloc but it's not exported. */
+  err = sock_create_lite(0, 0, 0, &newsock);
+  if (err < 0)
+    return err;
+  newsock->type = sock->type;
+  newsock->ops = sock->ops;
+
+  err = sock->ops->accept(sock, newsock, flags);
+  if (err < 0) {
+    sock_release(newsock);
+    return err;
+  }
+  *new_socket = (struct SimSocket *)newsock;
   return 0;
 }
 

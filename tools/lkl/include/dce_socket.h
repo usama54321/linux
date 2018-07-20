@@ -6,6 +6,7 @@
 #include <net/sock.h>
 #include "dce-init.h"
 #include "dce-types.h"
+#include <lkl_host.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -28,9 +28,9 @@ struct KernelHandle {
       struct DceSocket **socket);
   int (*sock_close)(struct DceSocket *socket);
   ssize_t (*sock_recvmsg)(struct DceSocket *socket, struct msghdr *msg,
-          int flags);
+          int flags, int fd);
   ssize_t (*sock_sendmsg)(struct DceSocket *socket,
-          const struct msghdr *msg, int flags);
+          const struct msghdr *msg, int flags, int fd);
   int (*sock_getsockname)(struct DceSocket *socket,
       struct sockaddr *name, int *namelen);
   int (*sock_getpeername)(struct DceSocket *socket,
