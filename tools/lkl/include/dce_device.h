@@ -2,8 +2,8 @@
 #include<lkl_host.h>
 
 struct SimDevice {
-  struct lkl_netdev nd;
   struct net_device dev;
+  void *nsNetDevice;
 }
 
 struct SimDevice *dce_dev_create (const char *iface, void *priv, enum SimDevFlags flags);

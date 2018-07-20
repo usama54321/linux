@@ -5,40 +5,6 @@
 #include <linux/if_arp.h>
 #include <linux/ethtool.h>
 
-
-struct lkl_dev_net_ops net_dce_ops =  {
-  .tx = net_dce_tx,
-  .rx = net_dce_rx,
-  .poll = net_dce_poll,
-  .poll_hup = net_dce_poll_hup,
-  .free = net_dce_free,
-};
-
-int net_dce_tx (struct lkl_netdev *nd, struct iovec *iov, int cnt)
-{
-
-}
-
-int net_dce_rx (struct lkl_netdev *nd, struct iovec *iov, int cnt)
-{
-
-}
-
-int net_dce_poll (struct lkl_netdev *nd)
-{
-
-}
-
-int net_dce_poll_hup (struct lkl_netdev *nd)
-{
-
-}
-
-int net_dce_free (struct lkl_netdev *nd)
-{
-
-}
-
 struct SimDevice *dce_dev_create (const char *iface, void *priv, enum SimDevFlags flags)
 {
   int err;
