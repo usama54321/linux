@@ -22,6 +22,11 @@ void *lib_malloc(unsigned long size);
 void lib_free(void *buffer);
 void *lib_memcpy(void *dst, const void *src, unsigned long size);
 void *lib_memset(void *dst, char value, unsigned long size);
+int dce_sem_init (sem_t *sem, int pshared, unsigned int value);
+void dce_sem_destroy (sem_t *sem);
+void dce_sem_post (sem_t *sem);
+void dce_wait (sem_t *sem);
+void dce_panic ();
 
 #endif /* DCE_HANDLE_API_H */
 

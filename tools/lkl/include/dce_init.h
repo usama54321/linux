@@ -80,6 +80,11 @@ struct KernelHandle {
 };
 
 struct DceHandle {
+  int (*sem_init) (struct DceKernel *kernel, sem_t *sem, int pshared, unsigned int value);
+  void (*sem_destroy) (DceKernel *kernel, sem_t *sem);
+  void (*sem_post) (DceKernel *kernel, sem_t *sem);
+  void (*sem_wait) (DceKernel *kernel, sem_t *sem);
+  void (*panic) (DceKernel *kernel);
   int (*vprintf)(struct DceKernel *kernel, const char *str,
       va_list args);
   void *(*malloc)(struct DceKernel *kernel, unsigned long size);

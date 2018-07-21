@@ -80,37 +80,45 @@ struct lkl_tls_key {
 
 static void panic (void)
 {
- /*
-  * Let DCE handle this.
-  * Add dce_panic, find correct header in DCE
-  */
+  dce_panic ();
 }
 
-/* 
- * TODO: Need to decide how to
- * SEMAPHORES should be handle in DCE
- */
 static struct lkl_sem* sem_alloc (int count)
 {
-  return NULL;
+  struct lkl_sem *sem;
+  sem = lib_malloc (sizeof (*sem));
+
+  if (!sem)
+    return NULL;
+
+  if (dce_sem_init (&sem->sem, 1, count) < 0)
+  {
+    // TODO: let DCE know the error about sem.
+    return NULL;
+  }
+
+  return sem;
 }
 
 static void sem_free (struct lkl_sem *sem)
 {
+  dce_sem_destory (&sem->sem);
 }
 
 static void sem_up (struct lkl_sem *sem)
 {
+  dce_sem_post (&sem->sem);
 }
 
 static void sem_down (struct lkl_sem *sem)
 {
+  int err;
+  do
+  {
+    err = dce_sem_wait (&sem->sem);
+  } while (err < 0 && errno == EINTR);
 }
 
-/* 
- * TODO: Need to decide how
- * to SEMAPHORES should be handle in DCE
- */
 static struct lkl_mutex *mutex_alloc (int recursive)
 {
   return NULL;
@@ -415,6 +423,31 @@ void *lib_memcpy(void *dst, const void *src, unsigned long size)
 void *lib_memset(void *dst, char value, unsigned long size)
 {
   return g_dceHandle.memset (g_kernel, dst, value, size);
+}
+
+int dce_sem_init (sem_t *sem, int pshared, unsigned int value)
+{
+  return g_dceHandle.sem_init (g_kernel, sem, pshared, value);
+}
+
+void dce_sem_destroy (sem_t *sem)
+{
+  g_dceHandle.sem_destroy (g_kernel, sem);
+}
+
+void dce_sem_post (sem_t *sem)
+{
+  g_dceHandle.sem_post (g_kernel, sem);
+}
+
+void dce_sem_wait (sem_t *sem)
+{
+  g_dceHandle.sem_wait (g_kernel, sem);
+}
+
+void dce_panic ()
+{
+  g_dceHandle->panic ();
 }
 
 static int fd_get_capacity(struct lkl_disk disk, unsigned long long *res)
