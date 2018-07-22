@@ -80,11 +80,19 @@ struct KernelHandle {
 };
 
 struct DceHandle {
-  int (*sem_init) (struct DceKernel *kernel, sem_t *sem, int pshared, unsigned int value);
+  int (*sem_init) (struct DceKernel *kernel, sem_t *sem, int pshared,
+                   unsigned int value);
   void (*sem_destroy) (DceKernel *kernel, sem_t *sem);
   void (*sem_post) (DceKernel *kernel, sem_t *sem);
   void (*sem_wait) (DceKernel *kernel, sem_t *sem);
   void (*panic) (DceKernel *kernel);
+  int  (*pthread_mutex_init) (DceKernel *kernel, pthread_mutex_t *mutex,
+                            const pthread_mutexattr_t *attribute);
+  int (*pthread_mutex_destroy) (DceKernel *kernel, pthread_mutex_t *mutex);
+  int (*pthread_mutex_lock) (DceKernel *kernel, pthread_mutex_t *mutex);
+  int (*pthread_mutex_unlock) (DceKernel *kernel, pthread_mutex_t *mutex);
+  int (*pthread_mutexattr_settype) (DceKernel *kernel, pthread_mutexattr_t *attribute, int kind);
+  int (*pthread_mutexattr_init) (DceKernel *kernel, pthread_mutexattr_t *attr);
   int (*vprintf)(struct DceKernel *kernel, const char *str,
       va_list args);
   void *(*malloc)(struct DceKernel *kernel, unsigned long size);

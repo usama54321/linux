@@ -5,7 +5,7 @@
  */
 #include <lkl_host.h>
 #include <lkl.h>
-#include <dce-init.h>
+#include <dce_init.h>
 #include <dce_socket.h>
 
 /*
@@ -121,19 +121,39 @@ static void sem_down (struct lkl_sem *sem)
 
 static struct lkl_mutex *mutex_alloc (int recursive)
 {
-  return NULL;
+  struct lkl_mutex *_mutex = malloc(sizeof(struct lkl_mutex));
+  pthread_mutex_t *mutex = NULL;
+  pthread_mutexattr_t attr;
+
+  if (!_mutex)
+    return NULL;
+
+  mutex = &_mutex->mutex;
+  WARN_DCE_PTHREAD(dce_pthread_mutexattr_init(&attr));
+
+  if (recursive)
+    WARN_DCE_PTHREAD(dce_pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE));
+
+  WARN_DCE_PTHREAD(dce_pthread_mutex_init(mutex, &attr));
+
+  return _mutex;
 }
 
 static void mutex_free (struct lkl_mutex *mutex)
 {
+  pthread_mutex_t *mutex = &_mutex->mutex;
+  WARN_PTHREAD(dce_pthread_mutex_destroy(mutex));
+  dce_free(_mutex);
 }
 
 static void mutex_lock (struct lkl_mutex *mutex)
 {
+  WARN_DCE_PTHREAD(dce_pthread_mutex_lock(&mutex->mutex));
 }
 
 static void mutex_unlock (struct lkl_mutex *mutex)
 {
+  WARN_DCE_PTHREAD(dce_pthread_mutex_unlock(&_mutex->mutex));
 }
 
 static lkl_thread_t thread_create (void (*fn)(void *), void *arg)
@@ -447,7 +467,37 @@ void dce_sem_wait (sem_t *sem)
 
 void dce_panic ()
 {
-  g_dceHandle->panic ();
+  g_dceHandle->panic (g_kernel);
+}
+
+int dce_pthread_mutex_init (pthread_mutex_t *mutex, const pthread_mutexattr_t *attribute)
+{
+  return g_dceHandle->pthread_mutex_init (g_kernel, mutex, attribute);
+}
+
+int dce_pthread_mutex_destroy (pthread_mutex_t *mutex)
+{
+  return g_dceHandle->pthread_mutex_destroy (g_kernel, mutex);
+}
+
+int dce_pthread_mutex_lock (pthread_mutex_t *mutex)
+{
+  return g_dceHandle->pthread_mutex_lock (g_kernel, mutex);
+}
+
+int dce_pthread_mutex_unlock (pthread_mutex_t *mutex)
+{
+  return g_dceHandle->pthread_mutex_unlock (g_kernel, mutex);
+}
+
+int dce_pthread_mutexattr_settype (pthread_mutexattr_t *attribute, int  kind)
+{
+  return g_dceHandle->pthread_mutexattr_settype (g_kernel, attribute, kind);
+}
+
+int dce_pthread_mutexattr_init (pthread_mutexattr_t *attr)
+{
+  return g_dceHandle->pthread_mutexattr_init (g_kernel, attr);
 }
 
 static int fd_get_capacity(struct lkl_disk disk, unsigned long long *res)
