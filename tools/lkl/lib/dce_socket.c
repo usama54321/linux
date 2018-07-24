@@ -5,6 +5,17 @@
 #include "dce-types.h"
 #include "dce_socket.h"
 
+static struct iovec *copy_iovec(const struct iovec *input, int len)
+{
+	int size = sizeof(struct iovec) * len;
+	struct iovec *output = lib_malloc(size);
+
+	if (!output)
+		return NULL;
+	lib_memcpy(output, input, size);
+	return output;
+}
+
 int dce_sock_socket (int domain, int type, int protocol, struct DceSocket **socket)
 {
   struct socket **kernel_socket = (struct socket **)socket;
@@ -32,14 +43,51 @@ int dce_sock_close (struct DceSocket *socket)
   return 0;
 }
 
-ssize_t dce_sock_recvmsg (struct DceSocket *socket, struct msghdr *msg, int flags, int fd)
+ssize_t dce_sock_recvmsg (struct DceSocket *socket, struct msghdr *msg, int flags)
 {
-  return lkl_sys_recvmsg (fd, msg, flag);
+	struct socket *kernel_socket = (struct socket *)socket;
+	struct msghdr msg_sys;
+	struct cmsghdr *user_cmsgh = msg->msg_control;
+	size_t user_cmsghlen = msg->msg_controllen;
+	int retval;
+
+	msg_sys.msg_name = msg->msg_name;
+	msg_sys.msg_namelen = msg->msg_namelen;
+	msg_sys.msg_control = msg->msg_control;
+	msg_sys.msg_controllen = msg->msg_controllen;
+	msg_sys.msg_flags = flags;
+
+	iov_iter_init(&msg_sys.msg_iter, READ,
+		msg->msg_iov, msg->msg_iovlen, iov_size(msg));
+
+	retval = sock_recvmsg(kernel_socket, &msg_sys, iov_size(msg), flags);
+
+	msg->msg_name = msg_sys.msg_name;
+	msg->msg_namelen = msg_sys.msg_namelen;
+	msg->msg_control = user_cmsgh;
+	msg->msg_controllen = user_cmsghlen - msg_sys.msg_controllen;
+	return retval;
 }
 
-ssize_t dce_sock_sendmsg (struct DceSocket *socket, const struct msghdr *msg, int flags, int fd)
+ssize_t dce_sock_sendmsg (struct DceSocket *socket, const struct msghdr *msg, int flags)
 {
-  return lkl_sys_sendmsg (fd, msg, flag);
+	struct socket *kernel_socket = (struct socket *)socket;
+	struct iovec *kernel_iov = copy_iovec(msg->msg_iov, msg->msg_iovlen);
+	struct msghdr msg_sys;
+	int retval;
+
+	msg_sys.msg_name = msg->msg_name;
+	msg_sys.msg_namelen = msg->msg_namelen;
+	msg_sys.msg_control = msg->msg_control;
+	msg_sys.msg_controllen = msg->msg_controllen;
+	msg_sys.msg_flags = flags;
+
+	iov_iter_init(&msg_sys.msg_iter, WRITE,
+		kernel_iov, msg->msg_iovlen, iov_size(msg));
+
+	retval = sock_sendmsg(kernel_socket, &msg_sys);
+	lib_free(kernel_iov);
+	return retval;
 }
 
 int dce_sock_getsockname (struct DceSocket *socket, struct sockaddr *name, int *namelen)
