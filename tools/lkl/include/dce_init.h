@@ -7,11 +7,10 @@
 #include <stdio.h>
 #include <linux/types.h>
 #include <time.h>
-
+#include <semaphore.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /**
  * Inspired from net-next-nuse - sim-init.h
@@ -282,7 +281,7 @@ struct DceHandle {
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    * @sem - pointer to semaphore
    */
-  void (*sem_destroy) (DceKernel *kernel, sem_t *sem);
+  void (*sem_destroy) (struct DceKernel *kernel, sem_t *sem);
 
   /**
    * @sem_post - increments the semaphore
@@ -290,7 +289,7 @@ struct DceHandle {
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    * @sem - pointer to semaphore
    */
-  void (*sem_post) (DceKernel *kernel, sem_t *sem);
+  void (*sem_post) (struct DceKernel *kernel, sem_t *sem);
 
   /**
    * @sem_wait - decrements the semaphore
@@ -298,7 +297,7 @@ struct DceHandle {
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    * @sem - pointer to semaphore
    */
-  void (*sem_wait) (DceKernel *kernel, sem_t *sem);
+  void (*sem_wait) (struct DceKernel *kernel, sem_t *sem);
 
   /**
    * @panic - let DCE know about the kernel panic
@@ -306,7 +305,7 @@ struct DceHandle {
    *
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    */
-  void (*panic) (DceKernel *kernel);
+  void (*panic) (struct DceKernel *kernel);
 
   /**
    * @pthread_mutex_init - initalize the mutex
@@ -315,7 +314,7 @@ struct DceHandle {
    * @mutex - pointer to mutex
    * @attribute - attributes to initalize the mutex
    */
-  int  (*pthread_mutex_init) (DceKernel *kernel, pthread_mutex_t *mutex,
+  int  (*pthread_mutex_init) (struct DceKernel *kernel, pthread_mutex_t *mutex,
                               const pthread_mutexattr_t *attribute);
 
   /**
@@ -324,7 +323,7 @@ struct DceHandle {
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    * @mutex - pointer to mutex
    */
-  int (*pthread_mutex_destroy) (DceKernel *kernel, pthread_mutex_t *mutex);
+  int (*pthread_mutex_destroy) (struct DceKernel *kernel, pthread_mutex_t *mutex);
 
   /**
    * @pthread_mutex_lock - locks the mutex pointed by mutex
@@ -332,7 +331,7 @@ struct DceHandle {
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    * @mutex - pointer to mutex
    */
-  int (*pthread_mutex_lock) (DceKernel *kernel, pthread_mutex_t *mutex);
+  int (*pthread_mutex_lock) (struct DceKernel *kernel, pthread_mutex_t *mutex);
 
   /**
    * @pthread_mutex_unlock - release the lock on mutex pointed by mutex
@@ -340,7 +339,7 @@ struct DceHandle {
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    * @mutex - pointer to mutex
    */
-  int (*pthread_mutex_unlock) (DceKernel *kernel, pthread_mutex_t *mutex);
+  int (*pthread_mutex_unlock) (struct DceKernel *kernel, pthread_mutex_t *mutex);
 
   /**
    * @pthread_mutexattr_settype - set the mutex attribute
@@ -349,7 +348,7 @@ struct DceHandle {
    * @attribute - pointer to mutex attribute
    * @kind - type of mutex
    */
-  int (*pthread_mutexattr_settype) (DceKernel *kernel, pthread_mutexattr_t *attribute, int kind);
+  int (*pthread_mutexattr_settype) (struct DceKernel *kernel, pthread_mutexattr_t *attribute, int kind);
 
   /**
    * @pthread_mutexattr_init - initialize the mutex attribute
@@ -357,7 +356,7 @@ struct DceHandle {
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    * @attribute - pointer to mutex attribute
    */
-  int (*pthread_mutexattr_init) (DceKernel *kernel, pthread_mutexattr_t *attribute);
+  int (*pthread_mutexattr_init) (struct DceKernel *kernel, pthread_mutexattr_t *attribute);
 
   /**
    * @vprintf - writes the string pointed by str into a logfile maintain by DCE
@@ -665,7 +664,7 @@ struct DceHandle {
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    * @arg - return value
    */
-  int (*pthread_exit) (struct DceKernel *kernel, void *arg);
+  void (*pthread_exit) (struct DceKernel *kernel, void *arg);
 
   /**
    * @pthread_join - wait for the termination of target thread

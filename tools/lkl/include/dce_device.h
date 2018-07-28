@@ -1,10 +1,9 @@
 #include <lkl.h>
 #include<lkl_host.h>
-
-struct SimDevice {
-  struct net_device dev;
-  void *nsNetDevice;
-}
+#include <linux/ethtool.h>
+#include <linux/netdevice.h>
+#include <linux/if_arp.h>
+#include <linux/ethtool.h>
 
 struct SimDevice *dce_dev_create (const char *iface, void *priv, enum SimDevFlags flags);
 

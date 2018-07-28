@@ -5,6 +5,11 @@
 #include <linux/if_arp.h>
 #include <linux/ethtool.h>
 
+struct SimDevice {
+  struct net_device dev;
+  void *nsNetDevice;
+};
+
 struct SimDevice *dce_dev_create (const char *iface, void *priv, enum SimDevFlags flags)
 {
   int err;
