@@ -1,6 +1,7 @@
 #include <linux/net.h>
 #include <linux/errno.h>
-#include <net/sock.h>
+//#include <net/sock.h>
+#include <linux/fs.h>
 #include "dce_init.h"
 #include "dce-types.h"
 #include "dce_socket.h"
@@ -9,8 +10,6 @@
 #include <linux/netdevice.h>
 #include <linux/poll.h>
 #include <linux/wait.h>
-#include <net/tcp_states.h>
-#include <net/inet_connection_sock.h>
 
 static struct iovec *copy_iovec(const struct iovec *input, int len)
 {
@@ -35,7 +34,7 @@ int dce_sock_socket (int domain, int type, int protocol, struct DceSocket **sock
   type &= SOCK_TYPE_MASK;
 
 
-  int reteval = sock_create(domain, type, protocol, kernel_socket);
+  int retval = sock_create(domain, type, protocol, kernel_socket);
   struct file *fp = lib_malloc(sizeof(struct file));
   (*kernel_socket)->file = fp;
   fp->f_cred = lib_malloc(sizeof(struct cred));
@@ -146,10 +145,10 @@ int dce_sock_shutdown (struct DceSocket *socket, int how)
 {
   struct socket *kernel_socket = (struct socket *)socket;
   int retval = kernel_socket->ops->shutdown(kernel_socket, how);
-  return error;
+  return retval;
 }
 
-int dce_sock_accept (struct DceSocket *socket, struct DceSocket **newSocket, int flags)
+int dce_sock_accept (struct DceSocket *socket, struct DceSocket **new_socket, int flags)
 {
   struct socket *sock, *newsock;
   int err;
@@ -186,7 +185,7 @@ int dce_sock_setsockopt (struct DceSocket *socket, int level, int optname, const
   int error;
 
   if (level == SOL_SOCKET)
-    err = sock_setsockopt(sock, level, optname, coptval, optlen);
+    error = sock_setsockopt(socket, level, optname, coptval, optlen);
   return error;
 }
 
@@ -194,6 +193,6 @@ int dce_sock_getsockopt (struct DceSocket *socket, int level, int optname, void 
 {
   struct socket *kernel_socket = (struct socket *)socket;
   int error;
-  error = sock_getsockopt(sock, level, optname, optval, optlen);
-  return err;
+  error = sock_getsockopt(socket, level, optname, optval, optlen);
+  return error;
 }
