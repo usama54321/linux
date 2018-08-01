@@ -41,7 +41,6 @@ int dce_sock_socket (int domain, int type, int protocol, struct DceSocket **sock
   return retval;
 }
 
-//TDOD: Do we need remove the scoket file descriptor created in dce_sock_socket.
 int dce_sock_close (struct DceSocket *socket)
 {
   struct socket *kernel_socket = (struct socket *)socket;
@@ -125,9 +124,9 @@ int dce_sock_connect (struct DceSocket *socket, const struct sockaddr *name, int
 {
   struct socket *kernel_socket = (struct socket *)socket;
   struct sockaddr_storage address;
-  
+
   memcpy(&address, name, namelen);
-  
+
   kernel_socket->file->f_flags = flags;
   int retval = kernel_socket->ops->connect(kernel_socket, (struct sockaddr *)&address,
           namelen, flags);

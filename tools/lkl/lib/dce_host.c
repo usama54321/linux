@@ -4,7 +4,7 @@
 #include <dce_socket.h>
 #include <dce_device.h>
 #include <pthread.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <sys/time.h>
 #include <time.h>
 #include <signal.h>
@@ -36,7 +36,7 @@ static int warn_pthread(int ret, char *str_exp)
 
 #define WARN_DCE_PTHREAD(exp) warn_pthread(exp, #exp)
 
-static void print (const char *str, int len) 
+static void print (const char *str, int len)
 {
   va_list args;
   lib_vprintf (str, args);
@@ -139,12 +139,7 @@ static void mutex_unlock (struct lkl_mutex *mutex)
 
 static lkl_thread_t thread_create (void (*fn)(void *), void *arg)
 {
-  /* TODO: is warn message set by DCE. */
   pthread_t thread;
-  /*
-   * TODO: might need to redefine; because it seems DCE pthread_create
-   *       returns zero only no error number.
-   */
   if (WARN_DCE_PTHREAD(g_dceHandle.pthread_create (g_kernel, &thread, NULL, (void* (*)(void *))fn, arg)))
     return 0;
   else
@@ -156,7 +151,6 @@ static void thread_detach (void)
 	WARN_DCE_PTHREAD(g_dceHandle.pthread_detach (g_kernel, g_dceHandle.pthread_self (g_kernel)));
 }
 
-/* TODO: verify any argument is need rather NULL. */
 static void thread_exit (void)
 {
   g_dceHandle.pthread_exit (g_kernel, NULL);
@@ -175,12 +169,6 @@ static lkl_thread_t thread_self (void)
   return (lkl_thread_t) g_dceHandle.pthread_self (g_kernel);
 }
 
-/*
- * Note: DCE uses NATIVE version of this function.
- *       For now let this function handle by original
- *       pthread library.
- * TODO: Check, any room to add this function in DCE (dce-pthread.cc).
- */
 static int thread_equal (lkl_thread_t a, lkl_thread_t b)
 {
   return pthread_equal((pthread_t)a, (pthread_t)b);
@@ -188,7 +176,6 @@ static int thread_equal (lkl_thread_t a, lkl_thread_t b)
 
 static struct lkl_tls_key *tls_alloc (void (*destructor)(void *))
 {
-  /* TODO: Why POSIX won't typecast to (lkl_tls_key *) */
 	struct lkl_tls_key *ret = g_dceHandle.malloc (g_kernel, sizeof (struct lkl_tls_key));
   if (WARN_DCE_PTHREAD(g_dceHandle.pthread_key_create (g_kernel, &ret->key, destructor)))
   {
@@ -221,11 +208,6 @@ static void* mem_alloc (unsigned long size)
   return g_dceHandle.malloc (g_kernel, (size_t) size);
 }
 
-/*
- * Standard and DCE free method doesn't
- * return any thing.
- * TODO: What should be the return value here?
- */
 static void mem_free (void * ptr)
 {
   g_dceHandle.free (g_kernel, ptr);
@@ -253,7 +235,6 @@ static void *timer_alloc (void (*fn)(void *), void *arg)
   err = g_dceHandle.timer_create (g_kernel, CLOCK_REALTIME, &se, &timer);
   if (err)
     return NULL;
-  /* TODO: why directly typecast into (void *) */
   return (void *)(long) timer;
 }
 
@@ -285,10 +266,6 @@ static void timer_free (void *timer)
  */
 static void* ioremap (long addr, int size)
 {
- /*
-  * As such not need;
-  * TODO:discuss and descibe some action
-  */
   return NULL;
 }
 
@@ -298,10 +275,6 @@ static void* ioremap (long addr, int size)
  */
 static int iomem_access (const volatile void *addr, void *val, int size, int write)
 {
- /*
-  * As such not need;
-  * TODO:discuss and descibe some action
-  */
   return 0;
 }
 
@@ -318,24 +291,22 @@ static long _gettid (void)
  */
 static void _jmp_buf_set (struct lkl_jmp_buf *jmpb, void (*f)(void))
 {
-  /* Seems relevant to dce, not sure how to handle; */
   return;
 }
 
 static void _jmp_buf_longjmp (struct lkl_jmp_buf *jmpb, int val)
 {
-  /* Seems relevant to dce, not sure how to handle; */
   return;
 }
 
 struct lkl_host_operations lkl_host_ops = {
   .print = print,
   .panic = panic,
-  /* .lkl_sem = lkl_sem, */
+  .sem_alloc = sem_alloc
   .sem_free = sem_free,
   .sem_up = sem_up,
   .sem_down = sem_down,
-  /* .lkl_mutex = lkl_mutex, */
+  .mutex_alloc = mutex_alloc,
   .mutex_free = mutex_free,
   .mutex_lock = mutex_lock,
   .mutex_unlock = mutex_unlock,
@@ -348,14 +319,14 @@ struct lkl_host_operations lkl_host_ops = {
   .tls_alloc = tls_alloc,
   .tls_free = tls_free,
   .tls_set = tls_set,
-  /* .tls_get = tls_get, */
+  .tls_get = tls_get,
   .mem_alloc = mem_alloc,
   .mem_free = mem_free,
   .time = time_ns,
   .timer_alloc = timer_alloc,
   .timer_set_oneshot = timer_set_oneshot,
   .timer_free = timer_free,
-  .ioremap = ioremap,
+  .ioremap = lkl_ioremap,
   .iomem_access = iomem_access,
   .gettid = _gettid,
   .jmp_buf_set = _jmp_buf_set,
@@ -393,11 +364,9 @@ void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHand
   kernelHandle->dev_rx = dce_dev_rx;
   kernelHandle->dev_create_packet = dce_dev_create_packet;
 
-/*
-   * TODO: fill the struct KernelHandle *export
+  /*
    * Start the kernel
    */
-  return; 
 }
 
 int lib_vprintf(const char *str, va_list args)
