@@ -302,7 +302,7 @@ static void _jmp_buf_longjmp (struct lkl_jmp_buf *jmpb, int val)
 struct lkl_host_operations lkl_host_ops = {
   .print = print,
   .panic = panic,
-  .sem_alloc = sem_alloc
+  .sem_alloc = sem_alloc,
   .sem_free = sem_free,
   .sem_up = sem_up,
   .sem_down = sem_down,
