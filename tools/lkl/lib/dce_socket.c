@@ -1,15 +1,14 @@
 #include <linux/net.h>
 #include <linux/errno.h>
-#include <net/sock.h>
-#include <linux/fs.h>
 #include "dce_init.h"
 #include "dce-types.h"
 #include "dce_socket.h"
-#include <linux/net.h>
-#include <linux/errno.h>
 #include <linux/netdevice.h>
 #include <linux/poll.h>
 #include <linux/wait.h>
+
+struct DceSocket {};
+struct  socket;
 
 static struct iovec *copy_iovec(const struct iovec *input, int len)
 {
@@ -28,10 +27,10 @@ int dce_sock_socket (int domain, int type, int protocol, struct DceSocket **sock
   int flags;
 
   /* from net/socket.c */
-  flags = type & ~SOCK_TYPE_MASK;
+  flags = type & 0xf;
   if (flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK))
     return -EINVAL;
-  type &= SOCK_TYPE_MASK;
+  type &= 0xf;
 
 
   int retval = sock_create(domain, type, protocol, kernel_socket);
