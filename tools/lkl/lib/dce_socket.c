@@ -1,11 +1,7 @@
 #include <linux/net.h>
-#include <linux/errno.h>
 #include "dce_init.h"
 #include "dce-types.h"
 #include "dce_socket.h"
-#include <linux/netdevice.h>
-#include <linux/poll.h>
-#include <linux/wait.h>
 
 struct DceSocket {};
 struct  socket;

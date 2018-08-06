@@ -1,9 +1,5 @@
 #include <lkl.h>
-#include <linux/ethtool.h>
-#include <linux/etherdevice.h>
 #include <linux/netdevice.h>
-#include <linux/if_arp.h>
-#include <linux/ethtool.h>
 
 struct SimDevice {
   struct net_device dev;
