@@ -259,25 +259,6 @@ static void timer_free (void *timer)
   return;
 }
 
-/*
- * @ioremap - searches for an I/O memory region identified by addr and size and
- * returns a pointer to the start of the address range that can be used by
- * iomem_access
- */
-static void* ioremap (long addr, int size)
-{
-  return NULL;
-}
-
-/*
- * @iomem_acess - reads or writes to and I/O memory region; addr must be in the
- * range returned by ioremap
- */
-static int iomem_access (const volatile void *addr, void *val, int size, int write)
-{
-  return 0;
-}
-
 static long _gettid (void)
 {
   return (long) g_dceHandle.pthread_self (g_kernel);
@@ -327,7 +308,7 @@ struct lkl_host_operations lkl_host_ops = {
   .timer_set_oneshot = timer_set_oneshot,
   .timer_free = timer_free,
   .ioremap = lkl_ioremap,
-  .iomem_access = iomem_access,
+  .iomem_access = lkl_iomem_access,
   .gettid = _gettid,
   .jmp_buf_set = _jmp_buf_set,
   .jmp_buf_longjmp = _jmp_buf_longjmp,
