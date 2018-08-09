@@ -1,7 +1,12 @@
 #include <linux/net.h>
+#include <linux/errno.h>
 #include "dce_init.h"
 #include "dce-types.h"
 #include "dce_socket.h"
+#include "dce_handle_api.h"
+
+#define READ 0
+#define WRITE 1
 
 struct DceSocket {};
 struct  socket;

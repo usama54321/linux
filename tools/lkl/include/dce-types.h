@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+struct SimSysFile {
+};
+
 /* Add structure list */
 enum SimDevFlags {
   SIM_DEV_NOARP         = (1 << 0),
@@ -25,9 +28,6 @@ struct SimSysIterator {
 struct SimDevicePacket {
  void *buffer;
  void *token;
-};
-
-struct SimSysFile {
 };
 
 #ifdef __cplusplus

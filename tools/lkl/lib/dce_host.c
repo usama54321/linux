@@ -83,7 +83,7 @@ static struct lkl_sem* sem_alloc (int count)
 
 static void sem_free (struct lkl_sem *sem)
 {
-  dce_sem_destory (&sem->sem);
+  dce_sem_destroy (&sem->sem);
 }
 
 static void sem_up (struct lkl_sem *sem)
@@ -123,8 +123,8 @@ static struct lkl_mutex *mutex_alloc (int recursive)
 static void mutex_free (struct lkl_mutex *_mutex)
 {
   pthread_mutex_t *mutex = &_mutex->mutex;
-  WARN_PTHREAD(dce_pthread_mutex_destroy(mutex));
-  dce_free(_mutex);
+  WARN_DCE_PTHREAD(dce_pthread_mutex_destroy(mutex));
+  lib_free(_mutex);
 }
 
 static void mutex_lock (struct lkl_mutex *mutex)

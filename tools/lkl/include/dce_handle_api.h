@@ -25,8 +25,15 @@ void *lib_memset(void *dst, char value, unsigned long size);
 int dce_sem_init (sem_t *sem, int pshared, unsigned int value);
 void dce_sem_destroy (sem_t *sem);
 void dce_sem_post (sem_t *sem);
-void dce_wait (sem_t *sem);
+void dce_sem_wait (sem_t *sem);
 void dce_panic ();
+int dce_pthread_mutexattr_init (pthread_mutexattr_t *attr);
+int dce_pthread_mutexattr_settype (pthread_mutexattr_t *attribute, int  kind);
+int dce_pthread_mutex_unlock (pthread_mutex_t *mutex);
+int dce_pthread_mutex_lock (pthread_mutex_t *mutex);
+int dce_pthread_mutex_destroy (pthread_mutex_t *mutex);
+int dce_pthread_mutex_init (pthread_mutex_t *mutex, const pthread_mutexattr_t *attribute);
+
 
 #endif /* DCE_HANDLE_API_H */
 
