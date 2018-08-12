@@ -390,7 +390,7 @@ void dce_sem_post (sem_t *sem)
   g_dceHandle.sem_post (g_kernel, sem);
 }
 
-void dce_sem_wait (sem_t *sem)
+int  dce_sem_wait (sem_t *sem)
 {
   g_dceHandle.sem_wait (g_kernel, sem);
 }
