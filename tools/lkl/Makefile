@@ -18,6 +18,7 @@ ifeq (,$(srctree))
   srctree := $(patsubst %/,%,$(dir $(srctree)))
 endif
 export srctree
+export LINUXINCLUDE
 
 -include ../scripts/Makefile.include
 
@@ -28,7 +29,6 @@ else
   OUTPUT := $(CURDIR)/
 endif
 export OUTPUT
-
 
 all:
 

@@ -48,7 +48,7 @@ define dce_host
   $(call set_autoconf_var,DCE,y)
   $(call set_autoconf_var,VIRTIO_NET,y)
   LDFLAGS += -pie
-  CFLAGS += -fPIC -I$(srctree)/include -I$(srctree)/inlcude/linux -I$(srctree)/include/net
+  CFLAGS += -fPIC -I$(srctree)/include -I$(srctree)/inlcude/linux -I$(srctree)/include/net $(LINUXINCLUDE)
   SOSUF := .so
   $(if $(filter $(1),elf64-x86-64-freebsd),$(call bsd_host))
   $(if $(filter yes,$(dpdk)),$(call virtio_net_dpdk))
