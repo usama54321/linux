@@ -91,13 +91,10 @@ static void sem_up (struct lkl_sem *sem)
   dce_sem_post (&sem->sem);
 }
 
+//TODO removing while loop redundant. assumption that semaphore always present
 static void sem_down (struct lkl_sem *sem)
 {
-  int err;
-  do
-  {
-    err = dce_sem_wait (&sem->sem);
-  } while (err < 0 && errno == EINTR);
+  dce_sem_wait (&sem->sem);
 }
 
 static struct lkl_mutex *mutex_alloc (int recursive)
@@ -137,6 +134,7 @@ static void mutex_unlock (struct lkl_mutex *mutex)
   WARN_DCE_PTHREAD(dce_pthread_mutex_unlock(&mutex->mutex));
 }
 
+//TODO implement dce side
 static lkl_thread_t thread_create (void (*fn)(void *), void *arg)
 {
   pthread_t thread;
@@ -146,16 +144,19 @@ static lkl_thread_t thread_create (void (*fn)(void *), void *arg)
     return (lkl_thread_t) thread;
 }
 
+//TODO add dce side
 static void thread_detach (void)
 {
 	WARN_DCE_PTHREAD(g_dceHandle.pthread_detach (g_kernel, g_dceHandle.pthread_self (g_kernel)));
 }
 
+//TODO add dce side
 static void thread_exit (void)
 {
   g_dceHandle.pthread_exit (g_kernel, NULL);
 }
 
+//TODO add dce side
 static int thread_join (lkl_thread_t tid)
 {
   if (WARN_DCE_PTHREAD(g_dceHandle.pthread_join (g_kernel, (pthread_t) tid, NULL)))
@@ -164,16 +165,19 @@ static int thread_join (lkl_thread_t tid)
     return 0;
 }
 
+//TODO add dce side
 static lkl_thread_t thread_self (void)
 {
   return (lkl_thread_t) g_dceHandle.pthread_self (g_kernel);
 }
 
+//TODO move to dce
 static int thread_equal (lkl_thread_t a, lkl_thread_t b)
 {
   return pthread_equal((pthread_t)a, (pthread_t)b);
 }
 
+//TODO add dce side
 static struct lkl_tls_key *tls_alloc (void (*destructor)(void *))
 {
 	struct lkl_tls_key *ret = g_dceHandle.malloc (g_kernel, sizeof (struct lkl_tls_key));
@@ -185,12 +189,14 @@ static struct lkl_tls_key *tls_alloc (void (*destructor)(void *))
   return ret;
 }
 
+//TODO add dce side
 static void tls_free (struct lkl_tls_key *key)
 {
   WARN_DCE_PTHREAD(g_dceHandle.pthread_key_delete (g_kernel, key->key));
   g_dceHandle.free (g_kernel, key);
 }
 
+//TODO add dce side
 static int tls_set (struct lkl_tls_key *key, void *data)
 {
   if (WARN_DCE_PTHREAD(g_dceHandle.pthread_setspecific (g_kernel, key->key, data)))
@@ -198,6 +204,7 @@ static int tls_set (struct lkl_tls_key *key, void *data)
   return 0;
 }
 
+//TODO add dce side
 static void tls_get(struct lkl_tls_key *key)
 {
   g_dceHandle.pthread_getspecific (g_kernel, key->key);
@@ -213,14 +220,17 @@ static void mem_free (void * ptr)
   g_dceHandle.free (g_kernel, ptr);
 }
 
+//TODO implement dce side. Fixed. already implemented
 static unsigned long long time_ns (void)
 {
   struct timespec ts;
   /* TODO: check which clk id best suits in DCE */
-  g_dceHandle.clock_gettime (g_kernel, CLOCK_MONOTONIC, &ts);
-  return 1e9*ts.tv_sec + ts.tv_nsec;
+  //g_dceHandle.clock_gettime (g_kernel, CLOCK_MONOTONIC, &ts);
+  g_dceHandle.current_ns(g_kernel);
+  //return 1e9*ts.tv_sec + ts.tv_nsec;
 }
 
+//TODO can be moved to EventSchedule. Need to separate create timer with timer_set_oneshot
 static void *timer_alloc (void (*fn)(void *), void *arg)
 {
   int err;
@@ -232,12 +242,13 @@ static void *timer_alloc (void (*fn)(void *), void *arg)
     },
     .sigev_notify_function = (void (*)(union sigval))fn,
   };
-  err = g_dceHandle.timer_create (g_kernel, CLOCK_REALTIME, &se, &timer);
+  err = g_dceHandle.event_schedule_ns(g_kernel, CLOCK_REALTIME, &se, &timer);
   if (err)
     return NULL;
   return (void *)(long) timer;
 }
 
+//TODO implement dce side
 static int timer_set_oneshot (void *_timer, unsigned long ns)
 {
   timer_t timer = (timer_t)(long)_timer;
@@ -270,11 +281,13 @@ static long _gettid (void)
  * function or any callee in that function to return back to the jump back
  * point
  */
+//TODO remove this
 static void _jmp_buf_set (struct lkl_jmp_buf *jmpb, void (*f)(void))
 {
   return;
 }
 
+//TODO remove this
 static void _jmp_buf_longjmp (struct lkl_jmp_buf *jmpb, int val)
 {
   return;
@@ -320,6 +333,7 @@ void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHand
   g_kernel = kernel;
   #include "kernel_handle_assignment_generated.c"
 
+  /*
   kernelHandle->sock_socket = dce_sock_socket;
   kernelHandle->sock_close = dce_sock_close;
   kernelHandle->sock_recvmsg = dce_sock_recvmsg;
@@ -344,7 +358,7 @@ void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHand
   kernelHandle->dev_set_mtu = dce_dev_set_mtu;
   kernelHandle->dev_rx = dce_dev_rx;
   kernelHandle->dev_create_packet = dce_dev_create_packet;
-
+   */
   /*
    * Start the kernel
    */
@@ -390,9 +404,9 @@ void dce_sem_post (sem_t *sem)
   g_dceHandle.sem_post (g_kernel, sem);
 }
 
-int  dce_sem_wait (sem_t *sem)
+int dce_sem_wait (sem_t *sem)
 {
-  g_dceHandle.sem_wait (g_kernel, sem);
+  return g_dceHandle.sem_wait (g_kernel, sem);
 }
 
 void dce_panic ()

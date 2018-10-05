@@ -297,7 +297,7 @@ struct DceHandle {
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    * @sem - pointer to semaphore
    */
-  void (*sem_wait) (struct DceKernel *kernel, sem_t *sem);
+  int (*sem_wait) (struct DceKernel *kernel, sem_t *sem);
 
   /**
    * @panic - let DCE know about the kernel panic
@@ -567,7 +567,7 @@ struct DceHandle {
    *
    * @kernel - pointer to the C++ obejct corresponds to ns3::KernelSocketFdFactory
    */
-  __u64 (*current_ns)(struct DceKernel *kernel);
+  __u64 (*current_ns)(struct DceKernel *);
 
   /**
    * @task_start -
