@@ -17,6 +17,14 @@
 #include <lkl_host.h>
 #include "iomem.h"
 #include "jmp_buf.h"
+#include <dce_init.h>
+#include <dce_socket.h>
+#include <dce_device.h>
+#include "dce_handle_api.h"
+
+
+struct DceHandle g_dceHandle;
+struct DceKernel *g_kernel;
 
 /* Let's see if the host has semaphore.h */
 #include <unistd.h>
@@ -346,6 +354,44 @@ struct lkl_host_operations lkl_host_ops = {
 	.jmp_buf_longjmp = jmp_buf_longjmp,
 };
 
+void sim_init(struct KernelHandle *kernelHandle, const struct DceHandle *dceHandle, struct DceKernel *kernel)
+{
+  g_dceHandle = *dceHandle;
+  g_kernel = kernel;
+  //#include "kernel_handle_assignment_generated.c"
+
+  //kernelHandle->dev_create = dce_dev_create;
+  /*
+  kernelHandle->sock_socket = dce_sock_socket;
+  kernelHandle->sock_close = dce_sock_close;
+  kernelHandle->sock_recvmsg = dce_sock_recvmsg;
+  kernelHandle->sock_sendmsg = dce_sock_sendmsg;
+  kernelHandle->sock_getsockname = dce_sock_getsockname;
+  kernelHandle->sock_getpeername = dce_sock_getpeername;
+  kernelHandle->sock_bind = dce_sock_bind;
+  kernelHandle->sock_connect = dce_sock_connect;
+  kernelHandle->sock_listen = dce_sock_listen;
+  kernelHandle->sock_shutdown = dce_sock_shutdown;
+  kernelHandle->sock_shutdown = dce_sock_shutdown;
+  kernelHandle->sock_accept = dce_sock_accept;
+  kernelHandle->sock_ioctl = dce_sock_ioctl;
+  kernelHandle->sock_setsockopt = dce_sock_setsockopt;
+  kernelHandle->sock_getsockopt = dce_sock_getsockopt;
+  kernelHandle->dce_lkl_sysctl = lkl_sysctl;
+  kernelHandle->dce_lkl_sysctl_get = lkl_sysctl_get;
+  kernelHandle->dev_destroy = dce_dev_destroy;
+  kernelHandle->dev_get_private = dce_dev_get_private;
+  kernelHandle->dev_set_address = dce_dev_set_address;
+  kernelHandle->dev_set_mtu = dce_dev_set_mtu;
+  kernelHandle->dev_rx = dce_dev_rx;
+  kernelHandle->dev_create_packet = dce_dev_create_packet;
+   */
+  /*
+   * Start the kernel
+   */
+  lkl_start_kernel(&lkl_host_ops, "mem=100M");
+  return;
+}
 static int fd_get_capacity(struct lkl_disk disk, unsigned long long *res)
 {
 	off_t off;

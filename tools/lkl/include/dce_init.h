@@ -1,7 +1,7 @@
 #ifndef _DCE_INIT_H_
 #define _DCE_INIT_H_
 
-#include <lkl.h>
+//#include <lkl.h>
 #include "dce-types.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -24,7 +24,7 @@ struct KernelHandle {
    * the pointer to the functions defined in lkl.h
    * the functionality of every function is document in lkl.h
    */
-  #include "lkl_kernel_handle_api_generated.h"
+  //#include "lkl_kernel_handle_api_generated.h"
 
   struct SimTask *(*task_create)(void *priv, unsigned long pid);
   void *(*task_get_private)(struct SimTask *task);

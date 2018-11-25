@@ -79,7 +79,7 @@ struct SimDevice *dce_dev_create (const char *iface, void *priv, enum SimDevFlag
     dev->dev.flags |= IFF_BROADCAST; 
     memset(dev->dev.broadcast, 0xff, 6);
   }
-  dev->= priv;
+  dev->nsNetDevice = priv;
   err = register_netdev(&dev->dev);
   return dev;
 }
